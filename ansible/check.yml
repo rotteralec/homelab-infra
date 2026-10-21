@@ -4,7 +4,7 @@
   tasks:
     - name: Show OS and kernel
       ansible.builtin.debug:
-        msg: "{{ ansible_distribution }} {{ ansible_distribution_version }}, kernel {{ ansible_kernel }}"
+        msg: "{{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}, kernel {{ ansible_facts['kernel'] }}"
 
     - name: Read cgroup controllers
       ansible.builtin.command: cat /sys/fs/cgroup/cgroup.controllers
