@@ -1,0 +1,16 @@
+- name: Report node state
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Show OS and kernel
+      ansible.builtin.debug:
+        msg: "{{ ansible_distribution }} {{ ansible_distribution_version }}, kernel {{ ansible_kernel }}"
+
+    - name: Read cgroup controllers
+      ansible.builtin.command: cat /sys/fs/cgroup/cgroup.controllers
+      register: cgroups
+      changed_when: false
+
+    - name: Memory controller must be enabled
+      ansible.builtin.assert:
+        that: "'memory' in cgroups.stdout"

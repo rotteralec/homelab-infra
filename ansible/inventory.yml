@@ -1,0 +1,12 @@
+all:
+  vars:
+    ansible_user: ubuntu
+    ansible_become_exe: sudo.ws
+  children:
+    server:
+      hosts:
+        pi-1:
+    agents:
+      hosts:
+        pi-2:
+        pi-0:
