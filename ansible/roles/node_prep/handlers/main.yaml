@@ -1,0 +1,3 @@
+- name: Reboot node
+  ansible.builtin.reboot:
+    msg: "Rebooting to apply kernel command line changes"

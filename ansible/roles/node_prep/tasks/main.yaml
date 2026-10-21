@@ -1,0 +1,39 @@
+- name: Set hostname to the inventory name
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Stop cloud-init from resetting the hostname
+  ansible.builtin.copy:
+    dest: /etc/cloud/cloud.cfg.d/99-preserve-hostname.cfg
+    content: "preserve_hostname: true\n"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name:  Check which boot asset folders have a cmdline.txt
+  ansible.builtin.stat:
+    path: "{{ item }}/cmdline.txt"
+  loop: "{{ node_prep_boot_dirs }}"
+  register: node_prep_cmdline_stat
+
+- name: Add cgroup flags to the kernel command line
+  ansible.builtin.replace:
+    path: "{{ item.stat.path }}"
+    regexp: '^(?!.*cgroup_enable=memory)(.+)$'
+    replace: '\1 {{ node_prep_cgroup_flags }}'
+  loop: "{{ node_prep_cmdline_stat.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: item.stat.exists
+  notify: Reboot node
+
+- name: Read firewall status
+  ansible.builtin.command: ufw status
+  register: node_prep_ufw
+  changed_when: false
+  check_mode: false
+
+- name: Firewall must be inactive
+  ansible.builtin.assert:
+    that: "'Status: inactive' in node_prep_ufw.stdout"
+    fail_msg: "ufw is active. k3s needs 6443, 10250 and 8472/udp open between nodes."
