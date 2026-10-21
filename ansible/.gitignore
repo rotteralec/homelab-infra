@@ -1,0 +1,17 @@
+# Ansible
+.vault_pass*
+*.retry
+
+# Terraform
+.terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+
+# Kubernetes
+*kubeconfig*
+k3s.yaml
+
+# Local
+.env
